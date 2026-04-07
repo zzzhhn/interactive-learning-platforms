@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Learning Platforms</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #12121a; --border: #1e1e2e;
+      --text: #e4e4ef; --muted: #8888a0; --accent: #6b8afd;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+    }
+    h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 600; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 3rem; text-align: center; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem; max-width: 720px; width: 100%;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; text-decoration: none; color: inherit;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .card h2 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .card .course { font-size: 0.8rem; color: var(--accent); margin-bottom: 0.75rem; }
+    .card .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .card .meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.75rem; opacity: 0.7; }
+    footer { margin-top: 3rem; font-size: 0.8rem; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Interactive Learning Platforms</h1>
+  <p class="subtitle">University courses reimagined as interactive single-file web apps</p>
+  <div class="grid">
+    <a class="card" href="FIN4210/">
+      <h2>Corporate Finance</h2>
+      <div class="course">FIN4210</div>
+      <div class="desc">Knowledge graph, mock exams, case studies, TVM/NPV calculators, tiered quizzes</div>
+      <div class="meta">22,663 lines &middot; Chart.js &middot; MathJax</div>
+    </a>
+    <a class="card" href="FIN3080/">
+      <h2>Investment Analysis</h2>
+      <div class="course">FIN3080</div>
+      <div class="desc">Story mode, radar charts, company screener, decision trees, mind maps</div>
+      <div class="meta">16,272 lines &middot; Plotly &middot; MathJax</div>
+    </a>
+    <a class="card" href="MAT2002/">
+      <h2>Differential Equations</h2>
+      <div class="course">MAT2002</div>
+      <div class="desc">Slope field simulator, real-time graphing, step-by-step solver, bilingual</div>
+      <div class="meta">14,262 lines &middot; Plotly &middot; Math.js</div>
+    </a>
+    <a class="card" href="ACT4253/">
+      <h2>Business Ethics</h2>
+      <div class="course">ACT4253</div>
+      <div class="desc">Difficulty-tagged quizzes, star bookmarks, ethical framework explanations</div>
+      <div class="meta">1,879 lines &middot; Vanilla JS</div>
+    </a>
+  </div>
+  <footer>
+    <a href="https://github.com/zzzhhn/interactive-learning-platforms">View on GitHub</a>
+    &middot; Built by <a href="https://bobbyzhong.com">Bobby Zhong</a>
+  </footer>
+</body>
+</html>

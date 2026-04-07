@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Ethics Exam Simulator V2.1</title>
+    <style>
+        :root {
+            --bg-color: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-sec: #7f8c8d;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --warning: #f39c12;
+            --star-color: #f1c40f; /* Gold for stars */
+            --border: #e0e0e0;
+            --hover-bg: #f8f9fa;
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ecf0f1;
+            --text-sec: #bdc3c7;
+            --primary: #ecf0f1;
+            --accent: #5dade2;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --star-color: #ffd700;
+            --border: #404040;
+            --hover-bg: #3d3d3d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        /* Header & Controls */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .section-header {
+            background-color: var(--primary);
+            /* 关键修改：字体颜色使用 --card-bg 变量 
+               - 白天：背景深蓝，字体白色
+               - 夜间：背景浅灰，字体深灰（自动反色）
+            */
+            color: var(--card-bg); 
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            letter-spacing: 1px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            background: none;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .nav-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            color: var(--text-color);
+        }
+
+        h1 { text-align: center; color: var(--primary); }
+        .subtitle { text-align: center; color: var(--text-sec); margin-bottom: 30px; font-size: 0.9em; }
+
+        /* Quiz Styles */
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .difficulty-badge {
+            position: absolute;
+            top: 15px;
+            right: 65px; 
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 2;
+        }
+        .diff-Easy { background-color: var(--success); }
+        .diff-Medium { background-color: var(--warning); }
+        .diff-Hard { background-color: var(--danger); }
+
+        /* Star Bookmark Style */
+        .bookmark-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--border); /* Default gray */
+            transition: transform 0.2s, color 0.2s;
+            user-select: none;
+            line-height: 1;
+        }
+        .bookmark-btn:hover {
+            transform: scale(1.2);
+        }
+        .bookmark-btn.active { 
+            color: var(--star-color); /* Gold when active */
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-right: 120px;
+            line-height: 1.4;
+        }
+
+        .options label {
+            display: block;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .options label:hover { background: var(--hover-bg); }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(52, 152, 219, 0.1); 
+            border-left: 5px solid var(--accent);
+            border-radius: 4px;
+            display: none;
+            font-size: 0.95em;
+        }
+
+        .correct-text { color: var(--success); font-weight: bold; }
+        .wrong-text { color: var(--danger); font-weight: bold; }
+
+        /* Buttons */
+        .btn-container { display: flex; justify-content: center; gap: 20px; margin-top: 40px; flex-wrap: wrap; }
+        button {
+            padding: 15px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        /* ================= MIND MAP (LEFT-TO-RIGHT) STYLES ================= */
+        .mindmap-section {
+            display: none;
+            padding: 40px;
+            overflow-x: auto; /* Enable scrolling for wide maps */
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Basic Tree Container */
+        .tree {
+            display: flex;
+            justify-content: center; /* Center the root */
+            align-items: center;
+        }
+
+        .tree ul {
+            padding-left: 20px; /* Space between parent and children */
+            display: flex;
+            flex-direction: column; /* Stack siblings vertically */
+            position: relative;
+            list-style: none;
+        }
+
+        .tree li {
+            position: relative;
+            padding-left: 20px; /* Length of the horizontal connector */
+            margin: 5px 0;      /* Spacing between nodes */
+            display: flex;
+            align-items: center; /* Align node text with connectors */
+        }
+
+        /* --- CONNECTOR LINES --- */
+        
+        /* 1. Horizontal line leading to the node */
+        .tree li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 20px; /* Match padding-left */
+            height: 1px;
+            background-color: var(--text-sec);
+        }
+
+        /* 2. Vertical line connecting siblings */
+        .tree li::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 1px;
+            height: 100%;
+            background-color: var(--text-sec);
+            top: 0;
+        }
+
+        /* Fix: Stop vertical line for the first child (start at 50%) */
+        .tree li:first-child::after {
+            top: 50%;
+            height: 50%;
+        }
+
+        /* Fix: Stop vertical line for the last child (end at 50%) */
+        .tree li:last-child::after {
+            height: 50%;
+            bottom: 50%; /* Important to clear the bottom half */
+        }
+
+        /* Fix: If it's the only child, no vertical line needed */
+        .tree li:only-child::after {
+            display: none;
+        }
+
+        /* Special case: The very first Root UL shouldn't have lines */
+        .tree > ul { padding-left: 0; }
+        .tree > ul > li { padding-left: 0; }
+        .tree > ul > li::before, .tree > ul > li::after { display: none; }
+
+
+        /* --- NODE BOX STYLING --- */
+        .tree div {
+            border: 2px solid var(--border);
+            padding: 8px 15px;
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9em;
+            font-weight: 600;
+            white-space: nowrap; /* Keep text on one line */
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 2; /* Ensure box sits on top of lines */
+        }
+
+        /* Hover Effects */
+        .tree div:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: default;
+        }
+
+        /* Highlight Logic: When hovering a parent, highlight its connectors */
+        .tree li:hover > div {
+            border-color: var(--accent);
+        }
+        
+        /* Optional: Connectors turn color on hover (Advanced) */
+        .tree li:hover::before, .tree li:hover::after {
+            background-color: var(--accent);
+        }
+        button:active { transform: translateY(2px); }
+        #submit-btn { background-color: var(--success); color: white; }
+        #reset-btn { background-color: var(--danger); color: white; display: none; }
+        #filter-bookmarks-btn { background-color: var(--warning); color: white; }
+
+        #final-score { text-align: center; font-size: 2em; margin-top: 30px; font-weight: 800; color: var(--primary); }
+        
+        /* Simple Mind Map Placeholder Style */
+        .mindmap-section { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-controls">
+        <div>
+            <button class="nav-btn active" onclick="switchTab('quiz')">Quiz Mode</button>
+            <button class="nav-btn" onclick="switchTab('mindmap')">Knowledge Map</button>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+    </div>
+
+    <div id="quiz-section">
+        <h1>Business Ethics Exam Simulator</h1>
+        <div class="subtitle">Reviewing Chapters 1 to 6</div>
+        
+        <div id="quiz-area"></div>
+        <div id="final-score"></div>
+
+        <div class="btn-container">
+            <button id="submit-btn" onclick="submitQuiz()">Submit Answers</button>
+            <button id="reset-btn" onclick="initQuiz()">New Random Test</button>
+            <button id="filter-bookmarks-btn" onclick="loadBookmarksOnly()">★ Review Bookmarked Questions</button>
+        </div>
+    </div>
+
+    <div id="mindmap-section" class="mindmap-section">
+        <h1 style="text-align: center; margin-bottom: 30px;">Knowledge Map: Chapter 9 (Sustainability)</h1>
+        
+        <div class="tree">
+            <ul>
+                <li>
+                    <div>🌱 Business & Environment</div>
+                    <ul>
+                        <li>
+                            <div>Why Care? (Motivations)</div>
+                            <ul>
+                                <li><div>Human Self-Interest</div></li>
+                                <li><div>Survival Threats</div></li>
+                                <li><div>Prudence</div></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div>The 3 Responsibility Models</div>
+                            <ul>
+                                <li>
+                                    <div>1. Market Approach</div>
+                                    <ul>
+                                        <li><div>Maximize Profit</div></li>
+                                        <li><div>Resources = Infinite</div></li>
+                                        <li><div><em>Critique:</em> Externalities</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div>2. Regulatory Approach</div>
+                                    <ul>
+                                        <li><div>Obey the Law</div></li>
+                                        <li><div>Govt Standards</div></li>
+                                        <li><div><em>Critique:</em> Lags Behind</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div>3. Sustainability Approach</div>
+                                    <ul>
+                                        <li><div>Triple Bottom Line</div></li>
+                                        <li><div>Biophysical Limits</div></li>
+                                        <li><div>Backcasting</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div>Economics vs. Ecology</div>
+                            <ul>
+                                <li>
+                                    <div>Circular Flow Model</div>
+                                    <ul>
+                                        <li><div>Explain$ Exchange</div></li>
+                                        <li><div>Flaw: Ignores Limits</div></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div>Economy as Subset</div>
+                                    <ul>
+                                        <li><div>Herman Daly</div></li>
+                                        <li><div>Within Biosphere</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div>Sustainable Practices</div>
+                            <ul>
+                                <li><div>Eco-Efficiency</div></li>
+                                <li><div>Biomimicry</div></li>
+                                <li><div>Service Economy (Leasing)</div></li>
+                                <li><div>Cradle-to-Cradle</div></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <p style="text-align: center; margin-top: 20px; color: var(--text-sec); font-size: 0.8em;">(Tip: Scroll horizontally to view the full map)</p>
+    </div>
+</div>
+
+<script>
+    /* ================= DATA POOLS ================= */
+    
+    // --- MULTIPLE CHOICE POOL (Includes Ch 1, 2, 3, 4) ---
+    const poolMCQ = [
+        // Ch 1 & 2 Refresher
+        { q: "Business ethics primarily seeks to minimize:", options: ["Profits", "Avoidable negative consequences", "Legal restrictions", "Stakeholder input"], answer: 1, diff: "Easy", expl: "Core definition from Ch 1." },
+        { q: "Which factor of Moral Intensity refers to 'social agreement that an act is evil'?", options: ["Proximity", "Social Consensus", "Temporal Immediacy", "Magnitude"], answer: 1, diff: "Easy", expl: "Social Consensus." },
+        
+        // Ch 3: Philosophical Ethics
+        { q: "Utilitarianism determines the ethics of an act by looking at:", options: ["The motive of the actor", "The inherent rights involved", "The consequences/outcomes", "The character of the person"], answer: 2, diff: "Easy", expl: "Utilitarianism is a consequentialist theory: Greatest good for greatest number." },
+        { q: "Which philosopher is associated with Deontology and the 'Categorical Imperative'?", options: ["Jeremy Bentham", "Immanuel Kant", "Aristotle", "Milton Friedman"], answer: 1, diff: "Medium", expl: "Kant developed the Categorical Imperative (Duty-based ethics)." },
+        { q: "In the 'Trolley Problem', a Utilitarian would likely:", options: ["Refuse to pull the lever because killing is wrong.", "Pull the lever to save 5 people at the cost of 1.", "Ask what a virtuous person would do.", "Consult the legal code."], answer: 1, diff: "Medium", expl: "Utilitarianism calculates the net benefit: 5 lives > 1 life." },
+        { q: "The 'Golden Mean' (balance between excess and deficiency) is a concept from:", options: ["Virtue Ethics (Aristotle)", "Stockholder Theory", "Utilitarianism", "Kantian Ethics"], answer: 0, diff: "Medium", expl: "Virtue Ethics focuses on character traits found between extremes." },
+        { q: "Which framework asks: 'Are we treating people as ends in themselves, or merely as means'?", options: ["Utilitarianism", "Deontology (Kantian)", "Virtue Ethics", "Egoism"], answer: 1, diff: "Hard", expl: "This is the second formulation of Kant's Categorical Imperative." },
+        { q: "In the Batman vs. Joker case, why might Batman refuse to kill the Joker based on Virtue Ethics?", options: ["Because killing is illegal.", "Because the consequences would be bad.", "Because he does not want to become a murderer (character).", "Because the Joker has a right to life."], answer: 2, diff: "Hard", expl: "Virtue ethics focuses on the moral character of the agent ('Who do I want to be?')." },
+        { q: "What is a major challenge to Utilitarianism?", options: ["It ignores consequences.", "It is too rigid.", "Ends might justify unethical means (e.g., child labor for economy).", "It focuses too much on character."], answer: 2, diff: "Hard", expl: "Utilitarianism can justify harming minorities if it benefits the majority (Ends justify means)." },
+
+        // Ch 4: Corporate Culture & Leadership
+        { q: "A 'Compliance-based' culture relies primarily on:", options: ["Personal integrity", "Rules and legal obedience", "Shared values", "Ethical leadership"], answer: 1, diff: "Easy", expl: "Compliance cultures focus on following rules and laws; Values-based cultures focus on principles." },
+        { q: "In the Tylenol Crisis, James Burke's decision to recall all products is an example of:", options: ["Profit Maximization", "Ethical Leadership / Values-based culture", "Compliance-based culture", "Bad Barrel effect"], answer: 1, diff: "Medium", expl: "He followed the J&J Credo (Values) despite the massive cost, showing ethical leadership." },
+        { q: "According to the 'Effective vs. Ethical Leader' matrix, a leader who is ethically neutral but effective is:", options: ["An Ethical Leader", "An Unethical Leader", "Amoral / Ethically Silent", "Incompetent"], answer: 2, diff: "Hard", expl: "Leaders who don't talk about ethics but get results are often 'Ethically Silent', which can lead to problems." },
+        { q: "Ethical Leadership requires being both a 'Moral Person' and a:", options: ["Moral Manager", "Moral Policeman", "Moral Philosopher", "Moral Judge"], answer: 0, diff: "Medium", expl: "Ethical Leadership = Moral Person (Integrity) + Moral Manager (Communicating/Rewarding ethics)." },
+        { q: "Which cultural dimension (Hofstede) relates to 'how much inequality should there be'?", options: ["Uncertainty Avoidance", "Individualism", "Power Distance", "Masculinity"], answer: 2, diff: "Hard", expl: "Power Distance measures acceptance of hierarchy and inequality." },
+        { q: "What is a potential downside of a strong corporate culture?", options: ["It improves efficiency.", "It can become a barrier to diversity or change.", "It reduces employee turnover.", "It clarifies expectations."], answer: 1, diff: "Medium", expl: "Culture is a 'Double-Edged Sword': it provides stability but can hinder change or hide unethical norms (Bad Barrel)." },
+        
+        // Mixed Distractors
+        { q: "When a manager says 'We must do this to save the company', which concept is involved?", options: ["Categorical Imperative", "Neutralization (Claim of Necessity)", "Virtue Ethics", "Compliance Culture"], answer: 1, diff: "Medium", expl: "Claim of Necessity is a rationalization technique (Ch 2)." },
+        { q: "The 'Trickle-down effect' in Chapter 4 refers to:", options: ["Profits reaching the poor.", "Tone from the top influencing employees.", "Marketing affecting sales.", "Information leaks."], answer: 1, diff: "Easy", expl: "Leaders set the tone that trickles down to employees." },
+        // --- NEW BATCH: CHAPTER 1 & 2 (Foundations & Decision Making) ---
+        {
+        q: "A manager decides to fire an employee solely because the employee's performance metrics dropped below the contract minimum, ignoring the fact that the employee is sick. This rigid adherence to rules suggests which ethical perspective?", 
+        options: ["Values-based Culture", "Compliance-based / Bureaucratic", "Virtue Ethics", "Stakeholder Theory"], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Compliance cultures focus on strict adherence to rules/contracts rather than empathy or principles." 
+        },
+        {
+        q: "In the 'Parable of the Sadhu', the hikers left the dying man behind because they were focused on their goal of reaching the summit. This illustrates which cognitive limitation?", 
+        options: ["Tunnel Vision / Goal Fixation", "Unethical Pro-organizational Behavior (UPB)", "Moral Imagination", "Categorical Imperative"], 
+        answer: 0, 
+        diff: "Medium", 
+        expl: "Goal fixation causes people to ignore ethical implications. UPB is for the company; here it was personal achievement." 
+        },
+        {
+        q: "According to Moral Intensity theory (Jones), why might people care more about a plane crash killing 50 people than a famine killing 5,000 people in a distant country?", 
+        options: ["Magnitude of Consequences", "Proximity (Physical/Psychological)", "Social Consensus", "Categorical Imperative"], 
+        answer: 1, 
+        diff: "Hard", 
+        expl: "Proximity refers to the feeling of nearness. We care more about victims who are 'close' to us." 
+        },
+        {
+        q: "If Martin Shkreli argues 'I did nothing illegal by raising the drug price, so I did nothing wrong,' he is failing to distinguish between:", 
+        options: ["Utilitarianism and Deontology", "Law and Ethics", "Compliance and Values", "Short-term and Long-term"], 
+        answer: 1, 
+        diff: "Easy", 
+        expl: "Law is the moral minimum. Acts can be legal but unethical." 
+        },
+        {
+        q: "Which of the following is an example of 'Euphemistic Labeling'?", 
+        options: ["'It's not a bribe, it's a consulting fee.'", "'My boss made me do it.'", "'Everyone else is doing it.'", "'No one was really hurt.'"], 
+        answer: 0, 
+        diff: "Easy", 
+        expl: "Using soft language to mask the true nature of an action." 
+        },
+        {
+        q: "Milton Friedman (Stockholder Theory) would likely agree with which statement?", 
+        options: ["Corporations should donate to charity anonymously.", "Managers should use corporate funds to solve social problems.", "The only social responsibility of business is to increase its profits within the rules.", "Stakeholders are as important as shareholders."], 
+        answer: 2, 
+        diff: "Medium", 
+        expl: "Friedman argues against spending shareholder money on social causes unless it increases profit." 
+        },
+        {
+        q: "A salesperson lies to a customer to meet the monthly sales target, believing this helps the company survive. This is a classic example of:", 
+        options: ["Ethical Leadership", "Unethical Pro-organizational Behavior (UPB)", "Whistleblowing", "Moral Imagination"], 
+        answer: 1, 
+        diff: "Easy", 
+        expl: "UPB: Unethical acts intended to benefit the organization." 
+        },
+        {
+        q: "When weighing alternatives, if you ask 'How would I feel if this decision was published on the front page of the newspaper?', you are using:", 
+        options: ["The Disclosure Rule / New York Times Test", "The Profit Test", "The Legal Compliance Test", "The Efficiency Test"], 
+        answer: 0, 
+        diff: "Easy", 
+        expl: "This is a common practical test for personal integrity and reputation." 
+        },
+        {
+        q: "Which step of the decision-making process is most likely to fail if a person suffers from 'Moral Myopia' (inability to see ethical issues)?", 
+        options: ["Determine the facts", "Identify the ethical issues (Moral Awareness)", "Make a decision", "Monitor outcomes"], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Moral Awareness is the recognition that a situation has ethical content." 
+        },
+        {
+        q: "The 'Bad Barrel' argument suggests that unethical behavior is often caused by:", 
+        options: ["A few evil individuals.", "Lack of laws.", "A corrupt organizational culture/environment.", "Low moral intensity."], 
+        answer: 2, 
+        diff: "Easy", 
+        expl: "Bad Barrel = Organizational Environment (Culture, Pressure)." 
+        },
+        {
+        q: "Comparing your minor theft to a CEO's major fraud to make yourself feel better is known as:", 
+        options: ["Displacement of Responsibility", "Advantageous Comparison / Social Weighting", "Dehumanization", "Moral Imagination"], 
+        answer: 1, 
+        diff: "Hard", 
+        expl: "Justifying behavior by comparing it to worse acts by others." 
+        },
+        {
+        q: "Which is a 'Descriptive' ethical statement?", 
+        options: ["Bribery is wrong.", "Most managers in this industry accept kickbacks.", "We should treat employees fairly.", "Corporations ought to protect the environment."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Descriptive statements describe facts/behavior ('is'), not values ('ought')." 
+        },
+        {
+        q: "In the Wells Fargo case, employees opened fake accounts primarily because:", 
+        options: ["They were 'Bad Apples' with criminal records.", "The 'Bad Barrel' culture pressured them with unrealistic quotas.", "The law allowed it.", "They wanted to help the customers."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "The systemic pressure and culture (Barrel) were the root cause." 
+        },
+        {
+        q: "Which factor of Moral Intensity relates to how likely the harm is to occur?", 
+        options: ["Temporal Immediacy", "Probability of Effect", "Concentration of Effect", "Social Consensus"], 
+        answer: 1, 
+        diff: "Easy", 
+        expl: "Probability of Effect." 
+        },
+        {
+        q: "The concept that 'values' (e.g., financial success) drive our choices implies:", 
+        options: ["All values are ethical values.", "Values are irrelevant to business.", "We prioritize certain goods over others.", "Ethics is only about law."], 
+        answer: 2, 
+        diff: "Hard", 
+        expl: "Values are beliefs that incline us to act; we prioritize financial values vs ethical values." 
+        },
+
+    // --- NEW BATCH: CHAPTER 3 & 4 (Philosophy & Culture) ---
+        {
+        q: "A pharmaceutical company creates a drug that saves 1 million lives but causes severe side effects for 100 people. A Utilitarian would likely:", 
+        options: ["Reject the drug because it harms the 100.", "Approve the drug because the net benefit is positive.", "Ask if the 100 people gave consent.", "Focus on the character of the scientists."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Utilitarianism calculates the greatest good for the greatest number (Net benefit)." 
+        },
+        {
+        q: "Kant's 'Categorical Imperative' suggests that:", 
+        options: ["We should do whatever maximizes profit.", "We should act only on rules that we would want to be universal laws.", "Ethics depends on the situation (Relativism).", "The ends justify the means."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Universalizability is the first formulation of the Categorical Imperative." 
+        },
+        {
+        q: "Why is Child Labor a challenge for Utilitarianism?", 
+        options: ["It is strictly illegal everywhere.", "It might be justified if the economic benefits to society outweigh the child's suffering.", "It violates the categorical imperative.", "It shows a lack of virtue."], 
+        answer: 1, 
+        diff: "Hard", 
+        expl: "The main critique of Utilitarianism is that 'ends justify means,' potentially allowing rights violations for the greater good." 
+        },
+        {
+        q: "Virtue Ethics focuses primarily on:", 
+        options: ["The consequences of the act.", "The rules and duties involved.", "The moral character and habits of the agent.", "The profit margin."], 
+        answer: 2, 
+        diff: "Easy", 
+        expl: "Virtue ethics asks 'What kind of person should I be?'" 
+        },
+        {
+        q: "In the 'Batman vs. Joker' case, if Batman refuses to kill the Joker because 'it's not who I am', he is applying:", 
+        options: ["Utilitarianism", "Stockholder Theory", "Virtue Ethics", "Egoism"], 
+        answer: 2, 
+        diff: "Medium", 
+        expl: "He is concerned with his own character and integrity." 
+        },
+        {
+        q: "Which culture is characterized by 'Do the right thing' rather than 'Do what is written in the rulebook'?", 
+        options: ["Compliance-based Culture", "Values-based (Integrity) Culture", "Stockholder Culture", "Descriptive Culture"], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Values-based cultures rely on principles, allowing employees to handle situations where no rule exists." 
+        },
+        {
+        q: "Aaron Feuerstein (Malden Mills) paid his employees full salaries after a factory fire, eventually leading to bankruptcy. He is often cited as an example of:", 
+        options: ["An Effective but Unethical Leader", "An Ethical but Ineffective Leader", "A Compliance-based Leader", "A Utilitarian Leader"], 
+        answer: 1, 
+        diff: "Hard", 
+        expl: "He had high ethical character but failed the business effectiveness test (bankruptcy)." 
+        },
+        {
+        q: "The 'J&J Credo' used during the Tylenol crisis is an example of:", 
+        options: ["A strict legal contract.", "A mission statement guiding a Values-based culture.", "A marketing gimmick.", "A compliance manual."], 
+        answer: 1, 
+        diff: "Easy", 
+        expl: "The Credo listed responsibilities to customers first, guiding the recall decision." 
+        },
+        {
+        q: "According to Kant, treating a person as a 'mere means' to an end is:", 
+        options: ["Acceptable if it increases profit.", "Acceptable if the person is an employee.", "Unethical, as it violates human dignity.", "Required by Utilitarianism."], 
+        answer: 2, 
+        diff: "Hard", 
+        expl: "Human Dignity formulation: Treat humanity always as an end, never merely as a means." 
+        },
+        {
+        q: "Ethical Leadership: A 'Moral Manager' is distinct from a 'Moral Person' because a Moral Manager:", 
+        options: ["Is simply honest in private.", "Uses communication and rewards to promote ethics to others.", "Ignores the bottom line.", "Focuses only on law."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "A Moral Person has integrity; a Moral Manager *influences* others through role modeling and rewards." 
+        },
+        {
+        q: "Which represents a 'Hypothetical Duty' (as opposed to Categorical)?", 
+        options: ["Do not murder.", "Respect human dignity.", "If you want to avoid jail, do not steal.", "Tell the truth."], 
+        answer: 2, 
+        diff: "Hard", 
+        expl: "Hypothetical duties are conditional ('If... then...'). Categorical duties are absolute." 
+        },
+        {
+        q: "In a Compliance-based culture, what happens when a unique situation arises that isn't covered by a rule?", 
+        options: ["Employees use shared values to decide.", "Employees are empowered to act.", "Employees often freeze or make poor decisions.", "The culture automatically becomes Utilitarian."], 
+        answer: 2, 
+        diff: "Hard", 
+        expl: "Compliance cultures lack the flexibility of values-based cultures to handle gray areas." 
+        },
+        {
+        q: "Aristotle's 'Golden Mean' suggests that courage is a virtue located between:", 
+        options: ["Good and Evil.", "Cowardice and Rashness.", "Profit and Loss.", "Law and Chaos."], 
+        answer: 1, 
+        diff: "Medium", 
+        expl: "Virtue is the mean between excess (Rashness) and deficiency (Cowardice)." 
+        },
+        {
+        q: "The 'Tone at the Top' refers to:", 
+        options: ["The loudest person in the meeting.", "The ethical atmosphere set by senior leadership.", "The marketing message.", "The stock price."], 
+        answer: 1, 
+        diff: "Easy", 
+        expl: "Leadership sets the ethical tone that trickles down." 
+        },
+        {
+        q: "Which framework is most likely to support 'Cost-Benefit Analysis' in business?", 
+        options: ["Deontology", "Virtue Ethics", "Utilitarianism", "Religious Ethics"], 
+        answer: 2, 
+        diff: "Medium", 
+        expl: "CBA attempts to quantify pros/cons to maximize net benefit, which is a Utilitarian approach." 
+        },
+        
+        // --- CHAPTER 5: CSR (Corporate Social Responsibility) ---
+        {
+            q: "According to Milton Friedman's Economic Model, when is it acceptable for a corporate executive to donate company money to charity?",
+            options: ["Whenever the executive feels generous.", "When it helps redressing social injustices.", "When it serves the company's financial interests (e.g., tax, PR).", "Never, it is always theft."],
+            answer: 2,
+            diff: "Medium",
+            expl: "Friedman argues managers are agents of shareholders; spending money is only justified if it increases profit (Enlightened Self-Interest)."
+        },
+        {
+            q: "Which model of CSR suggests that social goals should be at the very core of a company's mission, equal to or above profit?",
+            options: ["The Economic Model", "The Stakeholder Model", "The Integrative Model", "The Compliance Model"],
+            answer: 2,
+            diff: "Easy",
+            expl: "Integrative Model: Integrating economic and social goals (e.g., Benefit Corporations)."
+        },
+        {
+            q: "In the 'Stakeholder Model', the concept of 'Moral Minimum' refers to:",
+            options: ["Making at least some profit.", "The obligation to cause no harm.", "The duty to donate 10% of revenue.", "Meeting the minimum legal standards."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Norman Bowie's 'Moral Minimum': Business has a duty to respect human rights and cause no harm, which overrides profit."
+        },
+        {
+            q: "Arc'teryx faced backlash for its fireworks show in Tibet. This conflict illustrates the danger of:",
+            options: ["Employment at Will.", "Hypothetical Imperatives.", "Violating one's own stated values (Hypocrisy).", "Excessive government regulation."],
+            answer: 2,
+            diff: "Medium",
+            expl: "The stunt contradicted their brand image of 'environmental stewardship', causing a reputation crisis."
+        },
+        {
+            q: "Which of the following is an argument often used to SUPPORT the Economic Model (Stockholder Theory)?",
+            options: ["Corporations have a moral duty to save the planet.", "Managers are not experts in public policy and should stick to business.", "Employees are the most important asset.", "Reputation is the only thing that matters."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Debate Argument: Friedman argues managers shouldn't act as unelected civil servants; they lack the expertise and authority to solve social problems."
+        },
+        {
+            q: "If a company engages in CSR activities solely to improve its image and cover up bad practices, this is known as:",
+            options: ["Enlightened Self-Interest", "Social Marketing / Greenwashing", "Integrative Management", "Due Process"],
+            answer: 1,
+            diff: "Easy",
+            expl: "Social Marketing focuses on the image rather than the substance of social responsibility."
+        },
+        {
+            q: "In the BP Deepwater Horizon case, the root cause of the disaster was identified as:",
+            options: ["Unavoidable natural causes.", "A culture of prioritizing profit and speed over safety.", "Excessive government regulation.", "Sabotage by competitors."],
+            answer: 1,
+            diff: "Medium",
+            expl: "BP cut corners and used cheap materials to maximize profit (Economic Model gone wrong)."
+        },
+        {
+            q: "Which level of ethical responsibility is considered the most obligatory (Mandatory)?",
+            options: ["Do good (Philanthropy)", "Prevent harm", "Do not cause harm", "Maximize happiness"],
+            answer: 2,
+            diff: "Easy",
+            expl: "Duty not to cause harm is the strongest obligation. 'Do good' is often seen as praiseworthy but optional."
+        },
+        {
+            q: "Enlightened Self-Interest presumes that:",
+            options: ["Good ethics is good business.", "Selfishness is a virtue.", "Profits should be sacrificed for charity.", "Laws are unnecessary."],
+            answer: 0,
+            diff: "Medium",
+            expl: "It suggests that ethical behavior leads to long-term financial success (Sustainability)."
+        },
+        {
+            q: "What is a 'Benefit Corporation' (B-Corp)?",
+            options: ["A non-profit charity.", "A for-profit company with legally protected social goals.", "A company that pays zero taxes.", "A government agency."],
+            answer: 1,
+            diff: "Hard",
+            expl: "B-Corps show that profit is not incompatible with doing good; they are legally chartered to pursue social ends."
+        },
+        {
+            q: "According to David Vogel, CSR is best understood as:",
+            options: ["A niche market strategy.", "A universal requirement for all firms.", "A violation of fiduciary duty.", "A replacement for government."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Vogel argues CSR caters to a specific group of consumers/investors, not the whole market."
+        },
+        {
+            q: "From a Utilitarian perspective, why might a company choose to implement high CSR standards?",
+            options: ["Because it is a categorical duty.", "To maximize long-term consequences (reputation, loyalty) for stakeholders.", "To follow the letter of the law.", "Because the CEO is a virtuous person."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Utilitarianism looks at consequences. Good CSR produces better overall outcomes (win-win)."
+        },
+        {
+            q: "The 'Trust Bank' concept in Reputation Management suggests that:",
+            options: ["Companies should own banks.", "A good image helps a firm survive future negative events.", "Trust is less important than cash.", "CSR is a waste of money."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Building up trust creates resilience against future scandals."
+        },
+        {
+            q: "Which stakeholder group's interest is primarily 'Return on Investment' (ROI)?",
+            options: ["Employees", "Customers", "Shareholders/Stockholders", "Suppliers"],
+            answer: 2,
+            diff: "Easy",
+            expl: "Shareholders invest capital expecting a financial return."
+        },
+        {
+            q: "A critic of the 'Integrative Model' might argue that:",
+            options: ["Business has no expertise in social work.", "Profits are evil.", "Shareholders should be the only focus.", "It causes too much harm."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Similar to Friedman's critique: Is business the right institution to solve social problems?"
+        },
+        {
+            q: "If a company uses 'Recycled Materials' in packaging but pollutes the river during production, it is failing at:",
+            options: ["Doing Good", "Preventing Harm", "Not Causing Harm", "Marketing"],
+            answer: 2,
+            diff: "Medium",
+            expl: "They are violating the most basic duty: Do not cause harm (Pollution)."
+        },
+        {
+            q: "Reputation Management is an example of ________ motivation for CSR.",
+            options: ["Intrinsic", "Instrumental", "Deontological", "Altruistic"],
+            answer: 1,
+            diff: "Hard",
+            expl: "Instrumental = doing it as a means to an end (profit/reputation), not for its own sake."
+        },
+        {
+            q: "The 'Invisible Hand' argument for the Economic Model relies on which ethical framework?",
+            options: ["Deontology", "Virtue Ethics", "Utilitarianism", "Relativism"],
+            answer: 2,
+            diff: "Hard",
+            expl: "It assumes free markets produce the greatest overall good (utility) for society."
+        },
+        {
+            q: "In the Stakeholder Model, employees are viewed as:",
+            options: ["Ends in themselves.", "Means to profit.", "A cost to be minimized.", "External stakeholders."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Kantian influence: Humans are ends, not just tools (means) for profit."
+        },
+        {
+            q: "Which is NOT a justification for CSR?",
+            options: ["Attracting better talent.", "Reducing regulatory risk.", "Immediate short-term profit maximization.", "Building brand loyalty."],
+            answer: 2,
+            diff: "Easy",
+            expl: "CSR often requires short-term sacrifice for long-term gain."
+        },
+    
+        // --- CHAPTER 6: Employer & Employee ---
+        {
+            q: "Employment at Will (EAW) allows an employer to fire an employee:",
+            options: ["Only for good cause.", "For any reason (unless illegal), or no reason at all.", "Only after a hearing.", "Only if the employee agrees."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Definition of EAW: absent a contract, employment can be terminated by either party at any time."
+        },
+        {
+            q: "Which ethical right protects employees from the arbitrary use of authority by management?",
+            options: ["Right to Privacy", "Due Process", "Freedom of Speech", "Property Rights"],
+            answer: 1,
+            diff: "Easy",
+            expl: "Due Process ensures fairness and protection against arbitrary power."
+        },
+        {
+            q: "A strong argument AGAINST Employment at Will (Negative side of debate) is:",
+            options: ["It restricts economic flexibility.", "It violates freedom of contract.", "There is a lack of mutuality (power imbalance).", "It is inefficient."],
+            answer: 2,
+            diff: "Hard",
+            expl: "Employees need the job more than the employer needs the specific employee, creating a power imbalance."
+        },
+        {
+            q: "In the context of Workplace Safety, the 'Free Market Approach' argues that:",
+            options: ["Risky jobs should pay higher wages (Risk Premium).", "Government must set standards.", "Safety is a human right.", "Employers are always liable."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Market logic: Workers freely choose risk in exchange for higher pay."
+        },
+        {
+            q: "What is a major flaw (Market Failure) in the Free Market approach to health and safety?",
+            options: ["Workers often lack perfect information about risks.", "Wages are too high.", "Government interferes too much.", "Employers care too much about safety."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Information asymmetry: Workers don't know the long-term health risks (e.g., chemicals)."
+        },
+        {
+            q: "OSHA represents which approach to workplace safety?",
+            options: ["Market Controlled", "Government Regulated / Mandatory Standards", "Voluntary Compliance", "Stakeholder Negotiation"],
+            answer: 1,
+            diff: "Easy",
+            expl: "Occupational Safety and Health Administration sets mandatory legal standards."
+        },
+        {
+            q: "Affirmative Action is often criticized by opponents as:",
+            options: ["Necessary for diversity.", "Reverse Discrimination.", "A form of Due Process.", "A Market Solution."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Debate point: Critics argue it discriminates against the majority (e.g., white males)."
+        },
+        {
+            q: "Studies showing that 'White-sounding' names get more callbacks than 'Black-sounding' names demonstrate:",
+            options: ["Overt Discrimination", "Covert / Unconscious Discrimination", "Affirmative Action", "Due Process"],
+            answer: 1,
+            diff: "Medium",
+            expl: "This is a form of hidden or subconscious bias in hiring."
+        },
+        {
+            q: "American Apparel was cited as a case study for:",
+            options: ["Excellent CSR.", "Sexual Harassment and Hostile Work Environment.", "Environmental Stewardship.", "Ethical Accounting."],
+            answer: 1,
+            diff: "Easy",
+            expl: "The company faced numerous lawsuits regarding sexual harassment and a toxic culture under Dov Charney."
+        },
+        {
+            q: "The 'Just Cause' standard for firing is the opposite of:",
+            options: ["Due Process", "Employment at Will", "Affirmative Action", "Safety Standards"],
+            answer: 1,
+            diff: "Hard",
+            expl: "Just Cause requires a valid reason; EAW requires no reason."
+        },
+        {
+            q: "Treating employees as 'human resources' to be used for profit aligns with which ethical framework?",
+            options: ["Kantian Deontology", "Utilitarianism (Instrumental value)", "Virtue Ethics", "Social Justice"],
+            answer: 1,
+            diff: "Hard",
+            expl: "Instrumental value: Valuing something as a means to an end (Profit)."
+        },
+        {
+            q: "Which argument supports the existence of Sweatshops?",
+            options: ["They violate human rights.", "They provide jobs and boost economic growth in developing nations.", "They are illegal globally.", "They destroy local culture."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Economic argument: It's a stepping stone for development (Market logic)."
+        },
+        {
+            q: "Sexual Harassment that involves a 'quid pro quo' means:",
+            options: ["A hostile work environment.", "Exchange of work-related benefits for sexual favors.", "Inappropriate jokes.", "Unwanted staring."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Quid pro quo = This for that."
+        },
+        {
+            q: "The 'Supreme Court Harvard Case' regarding Affirmative Action focused on:",
+            options: ["Gender discrimination.", "Discrimination against Asian-Americans in admissions.", "Age discrimination.", "Religious freedom."],
+            answer: 1,
+            diff: "Medium",
+            expl: "The allegation was that 'Holistic review' disguised a quota against Asian applicants."
+        },
+        {
+            q: "If an employer monitors employee emails to prevent theft, they are prioritizing:",
+            options: ["Privacy Rights", "Property Rights / Asset Protection", "Freedom of Speech", "Due Process"],
+            answer: 1,
+            diff: "Medium",
+            expl: "The conflict is often Property Rights (Employer) vs. Privacy Rights (Employee)."
+        },
+        {
+            q: "Why might a Utilitarian support Affirmative Action?",
+            options: ["Because it is a fundamental right.", "Because it increases diversity, which improves innovation and society.", "Because it treats people as ends.", "Because the law requires it."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Utilitarian argument: Diversity leads to better overall outcomes/consequences."
+        },
+        {
+            q: "The concept of 'Risk Premium' in wages assumes that:",
+            options: ["Employers are generous.", "Workers are forced to work.", "Workers freely choose risky jobs for more money.", "Government sets the wages."],
+            answer: 2,
+            diff: "Hard",
+            expl: "Free market assumption: Danger is compensated by higher pay."
+        },
+        {
+            q: "Which is NOT a valid legal reason to fire someone under EAW?",
+            options: ["Poor performance.", "Personality conflict.", "Race or Gender.", "Economic downturn."],
+            answer: 2,
+            diff: "Easy",
+            expl: "Discrimination laws (Civil Rights Act) limit EAW."
+        },
+        {
+            q: "To avoid Sexual Harassment liability, companies should have:",
+            options: ["A Zero Tolerance Policy.", "Higher wages.", "More male managers.", "Less communication."],
+            answer: 0,
+            diff: "Easy",
+            expl: "Clear policies and reporting mechanisms are essential."
+        },
+        {
+            q: "The argument that 'Employers own the business, so they should decide who works there' supports:",
+            options: ["Due Process", "Employment at Will", "Unions", "OSHA"],
+            answer: 1,
+            diff: "Medium",
+            expl: "Property rights argument for EAW."
+        },
+        
+        // ================= CHAPTER 7: PRIVACY & TECHNOLOGY (20 MCQs) =================
+
+        // --- Definitions & Sources of Privacy ---
+        {
+            q: "Which definition of privacy is most associated with the 'Right to be let alone'?",
+            options: ["Privacy as a Property Right", "Privacy as a Zone of Solitude", "Privacy as Control of Information", "Privacy as a Legal Tort"],
+            answer: 1,
+            diff: "Easy",
+            expl: "This is the first general understanding of privacy mentioned in the slides."
+        },
+        {
+            q: "If privacy is considered a 'Hypernorm' (Donaldson & Dunfee), this means:",
+            options: ["It is a value fundamental across culture and theory.", "It is only valid in Western countries.", "It depends entirely on the local laws.", "It is a hypothetical imperative."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Hypernorms are universal principles (like freedom of speech) that transcend local customs."
+        },
+        {
+            q: "From a property rights perspective, why might an employer argue they have the right to monitor emails?",
+            options: ["Because employees have no rights.", "Because the employer owns the equipment and bandwidth.", "To create a fun work environment.", "To increase the Hawthorne effect."],
+            answer: 1,
+            diff: "Medium",
+            expl: "The argument relies on the ownership of the means of communication (servers, computers)."
+        },
+        {
+            q: "Kant considers privacy to be a ________ imperative because it is rooted in autonomy.",
+            options: ["Hypothetical", "Categorical", "Optional", "Financial"],
+            answer: 1,
+            diff: "Medium",
+            expl: "Respecting privacy is an absolute duty (Categorical) derived from respecting persons as ends."
+        },
+        {
+            q: "The concept of 'Reciprocal Obligation' in the workplace suggests that:",
+            options: ["Only employees have duties.", "If employees respect employer property, employers must respect employee privacy.", "Employers can do whatever they want to ensure profit.", "Privacy is a one-way street."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Rights and duties go both ways. Respect is mutual."
+        },
+    
+        // --- Employee Monitoring ---
+        {
+            q: "According to the slides, a 2015 survey found that what percentage of employers use email/internet monitoring?",
+            options: ["5%", "21%", "50%", "90%"],
+            answer: 1,
+            diff: "Hard",
+            expl: "Specific statistic from the lecture slides: 21%."
+        },
+        {
+            q: "The 'Hawthorne Effect' in employee monitoring refers to:",
+            options: ["Workers quitting when monitored.", "Workers behaving better/working harder simply because they know they are observed.", "Workers suing the company.", "Managers ignoring the data."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Observation temporarily enhances productivity."
+        },
+        {
+            q: "Which of the following is NOT a best practice for ethical monitoring?",
+            options: ["Monitoring strictly for business interests.", "Prohibiting discrimination based on off-work activities.", "Secret monitoring to catch employees by surprise.", "Giving advance notice to employees."],
+            answer: 2,
+            diff: "Medium",
+            expl: "Secret monitoring violates the principle of informed consent and transparency."
+        },
+        {
+            q: "Why might monitoring cause a 'Hostile Workplace'?",
+            options: ["It shows the employer cares.", "It implies a lack of trust and disrespects dignity.", "It increases wages.", "It reduces legal liability."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Monitoring often signals suspicion, eroding the trust essential for a healthy culture."
+        },
+        {
+            q: "If an employer monitors an employee's private restroom breaks, this violates:",
+            options: ["The right to property.", "The limitation of monitoring to within the workplace.", "The Economic Model of CSR.", "The Stockholder Theory."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Monitoring should not extend to private areas."
+        },
+    
+        // --- Scenarios & Cases ---
+        {
+            q: "In the 'Apple vs. Facebook' conflict, Facebook argued that tracking users is necessary for:",
+            options: ["Protecting user privacy.", "Helping small businesses target ads efficiently (Utility).", "Upholding human rights.", "Preventing government surveillance."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Facebook used a Utilitarian argument: personalized ads create economic value."
+        },
+        {
+            q: "Apple's 'App Tracking Transparency' feature requires apps to:",
+            options: ["Pay Apple a fee.", "Ask users for permission to track their data (Opt-in).", "Stop showing ads entirely.", "Delete all user data."],
+            answer: 1,
+            diff: "Easy",
+            expl: "It enforces the principle of Informed Consent."
+        },
+        {
+            q: "Moral Free Space refers to an environment where:",
+            options: ["Hypernorms do not govern, allowing local culture to decide.", "Anything goes.", "Laws are strictly enforced.", "Privacy is absolute."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Donaldson & Dunfee: Areas where ethical standards can vary by culture, as long as they don't violate hypernorms."
+        },
+        {
+            q: "If an employee uses a work computer to plan a vacation, and the employer fires them after reading the email, the ethical conflict is between:",
+            options: ["Property Rights vs. Privacy Rights.", "Utilitarianism vs. Egoism.", "Marketing vs. Sales.", "Compliance vs. Values."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Employer owns the computer (Property) vs. Employee expects zone of solitude (Privacy)."
+        },
+        {
+            q: "Which justification for monitoring focuses on 'preventing sexual harassment lawsuits'?",
+            options: ["Managing workplace efficiency.", "Protecting proprietary info.", "Protecting against legal liability.", "The Hawthorne Effect."],
+            answer: 2,
+            diff: "Medium",
+            expl: "Employers monitor communication to ensure no illegal/harassing content exists."
+        },
+        {
+            q: "The 'Right to control information about oneself' allows individuals to:",
+            options: ["Hide illegal activities.", "Determine what kind of person they become and define their individuality.", "Sell company secrets.", "Ignore their boss."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Privacy defines individuality and personal freedom."
+        },
+        {
+            q: "Why is 'Consent' crucial in the ethics of technology?",
+            options: ["It makes data collection faster.", "It respects the user as an autonomous agent.", "It maximizes profit.", "It is a legal loophole."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Kantian view: Treating people as ends requires their voluntary agreement."
+        },
+        {
+            q: "A utilitarian argument FOR monitoring would focus on:",
+            options: ["Respecting employee dignity.", "The categorical duty to protect assets.", "The overall increase in productivity and reduction of waste.", "The inherent right to property."],
+            answer: 2,
+            diff: "Medium",
+            expl: "Utilitarianism looks at the net positive consequences (Efficiency)."
+        },
+        {
+            q: "If a company uses AI to scan resumes and it accidentally discriminates against women, this is an issue of:",
+            options: ["Invasion of Privacy.", "Unintended bias in technology.", "The Hawthorne Effect.", "Social Marketing."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Tech ethics involves understanding how tools can perpetuate bias."
+        },
+        {
+            q: "Privacy rights in the workplace are:",
+            options: ["Absolute and unlimited.", "Non-existent.", "Limited by the employer's rights and the employment contract.", "Only relevant for CEOs."],
+            answer: 2,
+            diff: "Easy",
+            expl: "Rights are rarely absolute; they must be balanced against other rights (Property/Contract)."
+        },
+        
+        // ================= CHAPTER 8: MARKETING ETHICS (20 MCQs) =================
+
+        // --- The 4 P's & Framework ---
+        {
+            q: "Which of the 4 P's deals with questions like 'Should we target children with this ad?'",
+            options: ["Product", "Price", "Placement", "Promotion"],
+            answer: 2,
+            diff: "Easy",
+            expl: "Placement/Targeting involves WHO receives the marketing message."
+        },
+        {
+            q: "In the 'Four P's', Price gouging (e.g., Turing Pharma) is an ethical failure of:",
+            options: ["Product", "Price", "Promotion", "Placement"],
+            answer: 1,
+            diff: "Easy",
+            expl: "Fairness in pricing."
+        },
+        {
+            q: "Which of the following is NOT a condition for an ethical market exchange?",
+            options: ["The transaction must be voluntary.", "Informed consent is needed.", "Both parties must be benefited.", "The seller must make at least 50% profit."],
+            answer: 3,
+            diff: "Medium",
+            expl: "Profit margin is not an ethical requirement; Voluntariness, Knowledge, and Benefit are."
+        },
+        {
+            q: "Externalities in marketing refer to:",
+            options: ["Costs not integrated into the exchange (e.g., pollution, health effects).", "Advertising to foreigners.", "Outsourcing production.", "Hiring external consultants."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Costs borne by third parties (society), like the health costs of tobacco."
+        },
+    
+        // --- Advertising & Manipulation ---
+        {
+            q: "The ethical defense of advertising is that it contributes to market ________ (Utilitarian).",
+            options: ["Monopoly", "Efficiency", "Manipulation", "Confusion"],
+            answer: 1,
+            diff: "Medium",
+            expl: "Information helps markets allocate resources efficiently."
+        },
+        {
+            q: "From a Kantian view, advertising is ethical only if it:",
+            options: ["Increases sales.", "Uses emotional appeals.", "Provides true information to help autonomous choices.", "Entertains the viewer."],
+            answer: 2,
+            diff: "Hard",
+            expl: "It must respect the consumer's autonomy by giving them accurate data to decide."
+        },
+        {
+            q: "What distinguishes 'Manipulation' from 'Persuasion'?",
+            options: ["Persuasion is illegal.", "Manipulation bypasses rational decision-making.", "Manipulation is always violent.", "Persuasion uses lies."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Manipulation guides behavior without the person's rational consent (e.g., using fear)."
+        },
+        {
+            q: "Targeting vulnerable populations (children, elderly) is unethical because:",
+            options: ["They have no money.", "They lack full autonomy/rationality to consent.", "It is too expensive.", "Companies don't like them."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Vulnerability implies a reduced capacity for informed, voluntary consent."
+        },
+        {
+            q: "The 'Dependency Effect' (Galbraith) suggests that:",
+            options: ["Marketing satisfies existing needs.", "Marketing creates wants that didn't exist before.", "Consumers depend on low prices.", "Marketers depend on data."],
+            answer: 1,
+            diff: "Hard",
+            expl: "If wants are contrived by the seller, satisfying them generates no true benefit."
+        },
+    
+        // --- American Apparel Case ---
+        {
+            q: "American Apparel was known for its 'Sweatshop-free' claim but faced controversy for:",
+            options: ["Using child labor.", "Sexual harassment and objectifying ads.", "High prices.", "Environmental pollution."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Dov Charney faced multiple sexual harassment suits; ads were highly sexualized."
+        },
+        {
+            q: "In 2009, American Apparel paid Woody Allen $5 million because:",
+            options: ["He directed their commercial.", "They used his image in an ad without permission.", "He was a shareholder.", "He designed their logo."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Violation of property/image rights in marketing."
+        },
+        {
+            q: "The ban of an American Apparel ad in the UK featuring a model who looked under 16 is an issue of:",
+            options: ["Price Fixing.", "Inappropriate Placement/Content.", "Insider Trading.", "Product Safety."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Ethical issue in Promotion (sexualizing minors)."
+        },
+        {
+            q: "American Apparel's hiring policy requiring full-body photos was criticized for:",
+            options: ["Being too slow.", "Discrimination based on appearance ('Look policy').", "Violating OSHA.", "Being too expensive."],
+            answer: 1,
+            diff: "Medium",
+            expl: "It prioritized aesthetics over skill, leading to discrimination claims."
+        },
+    
+        // --- General Marketing Ethics ---
+        {
+            q: "If a salesperson hides a defect in a used car, they violate:",
+            options: ["Informed Consent.", "The Hawthorne Effect.", "Employment at Will.", "The Economic Model."],
+            answer: 0,
+            diff: "Easy",
+            expl: "The buyer cannot consent if they don't know the truth."
+        },
+        {
+            q: "'Live Commerce' competitions (like the class exercise) often rely on strategies that might risk:",
+            options: ["Boring the audience.", "Impulse buying and fear of missing out (Manipulation).", "Providing too much information.", "Violating antitrust laws."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Time pressure creates urgency, bypassing rational deliberation."
+        },
+        {
+            q: "Greenwashing is a deceptive practice where:",
+            options: ["Products are actually green.", "Companies claim to be eco-friendly but aren't.", "Companies wash money.", "Marketing is banned."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Deceptive marketing regarding environmental impact."
+        },
+        {
+            q: "Strict Liability in product safety means:",
+            options: ["Producers are responsible for harm regardless of fault.", "Consumers are responsible.", "The government is responsible.", "No one is responsible."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Producers bear the burden of safety (Chapter 8 overlap with Product Liability)."
+        },
+        {
+            q: "A 'Paternalistic' manipulation is done:",
+            options: ["To harm the consumer.", "For the consumer's 'own good' (supposedly).", "To maximize profit.", "By the government only."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Guiding behavior because 'we know better than you'."
+        },
+        {
+            q: "The AMA defines marketing as an organizational function for creating and delivering ________ to customers.",
+            options: ["Products", "Value", "Ads", "Bills"],
+            answer: 1,
+            diff: "Easy",
+            expl: "Delivering VALUE is central to the AMA definition."
+        },
+        {
+            q: "If a pharmaceutical company raises the price of a life-saving drug by 5000% (Turing), it violates which ethical concern?",
+            options: ["Promotion ethics.", "Fairness/Justice in Pricing.", "Employee privacy.", "Product safety."],
+            answer: 1,
+            diff: "Easy",
+            expl: "A clear violation of fair pricing norms."
+        },
+        
+        // ================= CHAPTER 9: ENVIRONMENTAL SUSTAINABILITY (20 MCQs) =================
+
+        // --- Models of Sustainability ---
+        {
+            q: "The 'Market Approach' to environmental responsibility assumes that resources are ________, meaning they can be replaced by substitutes.",
+            options: ["Finite", "Fungible / Infinite", "Sacred", "Biophysical"],
+            answer: 1,
+            diff: "Medium",
+            expl: "Market theory assumes if one resource runs out, the price rises and we find a substitute (fungible)."
+        },
+        {
+            q: "What is a major 'Market Failure' identified in environmental ethics?",
+            options: ["Externalities (e.g., pollution costs not in price).", "High taxes.", "Too much regulation.", "The Invisible Hand."],
+            answer: 0,
+            diff: "Easy",
+            expl: "Externalities allow companies to dump costs onto society/future generations."
+        },
+        {
+            q: "Herman Daly criticizes the standard economic 'Circular Flow' model because:",
+            options: ["It treats the economy as an isolated system with infinite resources.", "It focuses too much on recycling.", "It ignores labor rights.", "It is too regulatory."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Daly argues the economy is a subset of the finite biosphere (Biophysical limits)."
+        },
+        {
+            q: "Which concept involves imagining a sustainable future and planning steps backwards to reach it?",
+            options: ["Forecasting", "Backcasting (The Natural Step)", "Strategic Planning", "Market Projection"],
+            answer: 1,
+            diff: "Medium",
+            expl: "The Natural Step framework uses backcasting to navigate the 'funnel'."
+        },
+        {
+            q: "The 'Regulatory Approach' to environmental ethics (e.g., Clean Air Act) is often criticized because:",
+            options: ["It is too efficient.", "Business lobbying can weaken the standards.", "It relies too much on market prices.", "It gives companies too much freedom."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Regulatory capture and the fact that law 'lags behind' are key critiques."
+        },
+    
+        // --- Scenarios & Applications ---
+        {
+            q: "If a chemical plant emits toxic fumes that cause illness in a nearby town, but the plant does not pay for the medical costs, this is an example of:",
+            options: ["A Negative Externality.", "Eco-efficiency.", "Biomimicry.", "A Categorical Imperative."],
+            answer: 0,
+            diff: "Easy",
+            expl: "The cost is 'externalized' to the community rather than paid by the producer."
+        },
+        {
+            q: "A company that shifts from selling carpets to 'leasing floor covering services' (taking back old carpets) is practicing:",
+            options: ["Planned Obsolescence.", "Service-based Economy / Closed-loop Supply Chain.", "Greenwashing.", "Employment at Will."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Interface Carpets example: Encourages recycling and durability over waste."
+        },
+        {
+            q: "The 'Triple Bottom Line' measures success in terms of:",
+            options: ["Profit, Revenue, and Growth.", "Economic, Ethical, and Environmental sustainability.", "Shareholders, Managers, and Employees.", "Product, Price, and Promotion."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Also known as People, Planet, Profit."
+        },
+        {
+            q: "Why might William Baxter (Market Approach) argue for an 'optimal level of pollution' rather than zero pollution?",
+            options: ["Because pollution is good.", "Because the opportunity cost of zero pollution (e.g., no hospitals, no food) is too high.", "Because he hates nature.", "Because of biophysical limits."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Baxter argues we trade off clean air for other human goods; we should only reduce pollution until the cost exceeds the benefit."
+        },
+        {
+            q: "Biomimicry in business refers to:",
+            options: ["Using animals for testing.", "Designing products/processes to model natural cycles (Waste = Food).", "Faking environmental data.", "Cloning employees."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Eliminating waste by mimicking nature's closed loops."
+        },
+        {
+            q: "If a company cuts down a forest faster than it can regrow, it is violating:",
+            options: ["Biophysical Limits.", "The Stockholder Theory.", "The Law of Supply and Demand.", "Employment at Will."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Daly's principle: Do not consume renewables faster than their regeneration rate."
+        },
+        {
+            q: "Which of the following is NOT a pillar of Sustainability?",
+            options: ["Economic", "Environmental", "Political", "Ethical/Social"],
+            answer: 2,
+            diff: "Easy",
+            expl: "The standard pillars are Economic, Environmental, and Social/Ethical."
+        },
+        {
+            q: "A 'Cradle-to-Grave' model of production ends with:",
+            options: ["Recycling.", "Rebirth.", "Waste in a landfill.", "Backcasting."],
+            answer: 2,
+            diff: "Easy",
+            expl: "Traditional linear economy: Take -> Make -> Waste (Grave)."
+        },
+        {
+            q: "The conservation movement's argument for preserving nature is primarily based on:",
+            options: ["Short-term profit.", "Prudence and self-interest (Human survival).", "Stockholder rights.", "Compliance."],
+            answer: 1,
+            diff: "Medium",
+            expl: "We need the biosphere to survive; destroying it is suicidal."
+        },
+        {
+            q: "If a business argues 'We comply with all environmental laws, so we are ethical', they are adopting the:",
+            options: ["Sustainability Approach.", "Regulatory / Compliance Approach.", "Virtue Ethics Approach.", "Integrative Approach."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Equating ethics with legal compliance is the Regulatory model."
+        },
+        {
+            q: "The 'Funnel' metaphor in The Natural Step represents:",
+            options: ["Increasing profit margins.", "Declining resources and increasing demand/population over time.", "The sales pipeline.", "Government regulations."],
+            answer: 1,
+            diff: "Hard",
+            expl: "The walls of the funnel (resources vs demand) are closing in, requiring sustainable innovation to survive."
+        },
+        {
+            q: "Treating the economy as a 'subset of the biosphere' implies:",
+            options: ["Economic growth is boundless.", "The economy is constrained by physical laws (Thermodynamics).", "Nature exists only for profit.", "Markets are perfect."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Herman Daly's ecological economics view."
+        },
+        {
+            q: "Which is a valid Utilitarian argument for sustainability?",
+            options: ["Nature has intrinsic rights.", "We have a duty to rocks and trees.", "Unchecked consumption harms future generations (Greatest number).", "It is written in the constitution."],
+            answer: 2,
+            diff: "Medium",
+            expl: "Utilitarianism considers the well-being of future generations."
+        },
+        {
+            q: "'Eco-efficiency' means:",
+            options: ["Cutting costs by polluting more.", "Doing more with less (reducing resource intensity).", "Spending more on green marketing.", "Stopping production entirely."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Producing more value with less resource use."
+        },
+        {
+            q: "Why is the price of a product often considered a poor indicator of its true environmental cost?",
+            options: ["It includes too many taxes.", "It fails to account for public goods and externalities.", "It is controlled by the government.", "It is too high."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Market failure: The price tag doesn't include the cost of the smog created making it."
+        },
+    
+        // ================= CHAPTER 10: CORPORATE GOVERNANCE (20 MCQs) =================
+    
+        // --- Gatekeepers & Professionals ---
+        {
+            q: "Professionals like auditors, analysts, and attorneys are known as ________ because they ensure market integrity.",
+            options: ["Stockholders", "Gatekeepers", "Whistleblowers", "CEOs"],
+            answer: 1,
+            diff: "Easy",
+            expl: "They 'open the gate' to the market only for compliant firms."
+        },
+        {
+            q: "A 'Conflict of Interest' occurs when:",
+            options: ["Two employees argue.", "A professional's personal interest clashes with their professional/fiduciary duty.", "A company competes with another company.", "An employee dislikes their boss."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Classic definition: Personal gain vs. Professional duty."
+        },
+        {
+            q: "In the Enron case, Arthur Andersen failed as a gatekeeper because:",
+            options: ["They lacked accounting skills.", "They had a conflict of interest (Auditing vs. Consulting fees).", "They were too strict.", "They were not paid enough."],
+            answer: 1,
+            diff: "Medium",
+            expl: "They compromised auditing standards to keep the lucrative consulting contracts."
+        },
+        {
+            q: "Fiduciary duties are owed by ________ to ________.",
+            options: ["Employees to Customers.", "Board Members/Managers to Shareholders/Organization.", "Government to Business.", "Suppliers to Buyers."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Board members are fiduciaries acting on behalf of the owners (Principal-Agent)."
+        },
+        {
+            q: "Which of the following is NOT a legal duty of board members?",
+            options: ["Duty of Care", "Duty of Loyalty", "Duty of Good Faith", "Duty of Profit Maximization at all costs"],
+            answer: 3,
+            diff: "Medium",
+            expl: "Profit maximization is a goal, but not a legal duty that overrides law or ethics. Care, Loyalty, Good Faith are the legal standards."
+        },
+    
+        // --- Executive Comp & Insider Trading ---
+        {
+            q: "A Deontological justification for high Executive Compensation is:",
+            options: ["It incentivizes future performance.", "It ensures the best talent is hired.", "The executive earned it and deserves it as a reward for past work.", "It trickles down to the poor."],
+            answer: 2,
+            diff: "Hard",
+            expl: "Deontology looks at rights/desert (Backward looking: You earned it). Consequentialism looks at incentives (Forward looking)."
+        },
+        {
+            q: "Why is 'Insider Trading' considered unethical?",
+            options: ["It makes too much money.", "It violates fairness and misappropriates property (information).", "It helps the stock market.", "It is a victimless crime."],
+            answer: 1,
+            diff: "Medium",
+            expl: "It creates an unfair playing field and involves theft of proprietary info."
+        },
+        {
+            q: "The Sarbanes-Oxley Act (SOX) was passed in response to:",
+            options: ["The 2008 Financial Crisis.", "The Enron and WorldCom accounting scandals.", "The BP Oil Spill.", "The Tylenol Crisis."],
+            answer: 1,
+            diff: "Easy",
+            expl: "SOX (2002) regulates auditing and financial reporting."
+        },
+        {
+            q: "The 'Duty of Care' requires board members to:",
+            options: ["Guarantee profit.", "Exercise reasonable diligence and not be negligent.", "Blindly follow the CEO.", "Donate to charity."],
+            answer: 1,
+            diff: "Medium",
+            expl: "They must pay attention and act as a prudent person would."
+        },
+        {
+            q: "Critics of high CEO pay argue that:",
+            options: ["There is a weak correlation between pay and performance.", "CEOs work too hard.", "It motivates employees.", "It reduces stock prices."],
+            answer: 0,
+            diff: "Medium",
+            expl: "Pay often goes up even when the company fails (e.g., Golden Parachutes)."
+        },
+        
+        // --- Scenarios & Applications ---
+        {
+            q: "If an auditor approves a fraudulent financial statement because they are afraid of losing the client, they have violated their:",
+            options: ["Duty of Care.", "Professional/Ethical duties (Independence).", "Right to Privacy.", "Property Rights."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Auditors have a public duty that supersedes their desire to please the client."
+        },
+        {
+            q: "Board members are often criticized for lacking independence because:",
+            options: ["They are often hand-picked by the CEO.", "They are elected by the public.", "They don't own stock.", "They are too young."],
+            answer: 0,
+            diff: "Easy",
+            expl: "Cronyism: If the CEO picks the board, the board won't monitor the CEO effectively."
+        },
+        {
+            q: "The 'Principal-Agent' problem in corporate governance refers to:",
+            options: ["The conflict between Shareholders (Principals) and Managers (Agents).", "The conflict between Buyers and Sellers.", "The conflict between Employers and Unions.", "The conflict between Apple and Facebook."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Managers may act for their own benefit (e.g., private jets) rather than the owners'."
+        },
+        {
+            q: "If a Board Member buys land knowing the company plans to build a factory there next month, they are:",
+            options: ["Showing good initiative.", "Violating the Duty of Loyalty (Self-dealing/Conflict of Interest).", "Exercising the Duty of Care.", "Practicing Utilitarianism."],
+            answer: 1,
+            diff: "Medium",
+            expl: "Using corporate info for personal gain puts self-interest above the company."
+        },
+        {
+            q: "A Consequentialist argument FOR high CEO pay is:",
+            options: ["They have a right to the money.", "It acts as an incentive to produce better results for shareholders.", "It is fair.", "It is legal."],
+            answer: 1,
+            diff: "Hard",
+            expl: "Incentive = Future consequence (Better performance)."
+        },
+        {
+            q: "In the 'Conflict of Interest' diagram (Ch 10), who hires the CPA firm?",
+            options: ["The Public.", "The Government.", "The Client (Management/Board).", "The Stock Exchange."],
+            answer: 2,
+            diff: "Easy",
+            expl: "This structural flaw (being paid by the person you audit) creates the conflict."
+        },
+        {
+            q: "Which is NOT a Gatekeeper profession?",
+            options: ["Auditor", "Financial Analyst", "Marketing Director", "Attorney"],
+            answer: 2,
+            diff: "Easy",
+            expl: "Marketing's job is sales, not verifying integrity/compliance for the market."
+        },
+        {
+            q: "The 'Duty of Good Faith' implies:",
+            options: ["Obedience to the organization's mission and avoiding illegal acts.", "Always making a profit.", "Never firing anyone.", "Blind loyalty to the CEO."],
+            answer: 0,
+            diff: "Hard",
+            expl: "Good faith = acting honestly and in line with the purpose of the corporation."
+        },
+        {
+            q: "What role do Investment Banks play as gatekeepers?",
+            options: ["They manufacture products.", "They evaluate and verify a company's financial health for investors.", "They hire employees.", "They clean the environment."],
+            answer: 1,
+            diff: "Medium",
+            expl: "They issue ratings (Buy/Sell) that investors rely on."
+        },
+        {
+            q: "When a Board fails to provide oversight (like in Enron), who is ultimately harmed?",
+            options: ["Only the CEO.", "Stakeholders (Employees, Investors, Retirees).", "Competitors.", "No one."],
+            answer: 1,
+            diff: "Easy",
+            expl: "Governance failures destroy value for all stakeholders."
+        }
+    ];
+
+    // --- FILL IN THE BLANKS POOL ---
+    const poolFill = [
+        { q: "The ________ Imperative is a central concept in Kantian ethics (Duty).", a: ["categorical"], diff: "Medium", expl: "Categorical vs. Hypothetical duties." },
+        { q: "________ ethics focuses on the character of the moral agent rather than the act.", a: ["virtue"], diff: "Easy", expl: "Aristotle's Virtue Ethics." },
+        { q: "________ implies 'the greatest good for the greatest number'.", a: ["utilitarianism"], diff: "Easy", expl: "Consequentialist theory." },
+        { q: "A ________-based culture relies on a mission statement and principles rather than just rules.", a: ["values", "value"], diff: "Medium", expl: "Values-based vs. Compliance-based." },
+        { q: "The ________ crisis is a classic case study of good ethical leadership at J&J.", a: ["tylenol"], diff: "Easy", expl: "1982 Cyanide poisoning case." },
+        { q: "Unethical ________-organizational behavior (UPB) is done to benefit the company.", a: ["pro"], diff: "Hard", expl: "Pro-organizational." },
+        { q: "________ intensity is the extent to which an issue feels morally important.", a: ["moral"], diff: "Easy", expl: "Moral Intensity (Jones)." },
+        { q: "Denial of ________ is a neutralization technique where one blames authority.", a: ["responsibility"], diff: "Medium", expl: "I had no choice." },
+        { q: "The ________ refers to the shared beliefs and expectations in an organization.", a: ["culture"], diff: "Easy", expl: "Corporate Culture." },
+        { q: "Ethical leaders must act as a moral ________ to influence employees.", a: ["manager", "person"], diff: "Hard", expl: "Moral Person + Moral Manager." },
+        // --- NEW BATCH: CHAPTER 1 & 2 ---
+        { q: "Business ethics asks us to minimize ________ negative consequences.", a: ["avoidable"], diff: "Easy", expl: "Definition Ch 1." },
+        { q: "The law is often described as the moral ________ (floor).", a: ["minimum"], diff: "Easy", expl: "Ethics is the ceiling, law is the floor." },
+        { q: "________ ethics describes how people actually act.", a: ["descriptive"], diff: "Medium", expl: "vs Normative." },
+        { q: "A ________ is anyone who can affect or is affected by the business.", a: ["stakeholder"], diff: "Easy", expl: "Freeman's theory." },
+        { q: "Cognitive ________ is the mental stress of holding two conflicting beliefs.", a: ["dissonance"], diff: "Medium", expl: "Ch 2 Psychology." },
+        { q: "Euphemistic ________ is calling a bribe a 'consulting fee'.", a: ["labeling"], diff: "Medium", expl: "Neutralization technique." },
+        { q: "Denial of ________ is claiming 'they deserved it' or 'no one was innocent'.", a: ["victim"], diff: "Hard", expl: "Neutralization technique." },
+        { q: "Bad ________ refers to a corrupt organizational environment/culture.", a: ["barrel", "barrels"], diff: "Easy", expl: "Apples/Cases/Barrels model." },
+        { q: "Moral ________ refers to the intensity or importance of an ethical issue.", a: ["intensity"], diff: "Medium", expl: "Jones (1991)." },
+        { q: "________ immediacy is the time between the act and its consequences.", a: ["temporal"], diff: "Hard", expl: "Factor of Moral Intensity." },
+
+        // --- NEW BATCH: CHAPTER 3 & 4 ---
+        { q: "________ aims for the 'greatest good for the greatest number'.", a: ["utilitarianism", "utilitarian"], diff: "Easy", expl: "Consequentialist theory." },
+        { q: "Deontology focuses on duties, rules, and ________.", a: ["rights", "principles"], diff: "Medium", expl: "Rights-based ethics." },
+        { q: "Kant's ________ Imperative says we must act on universalizable rules.", a: ["categorical"], diff: "Hard", expl: "Absolute duty." },
+        { q: "Virtue ethics focuses on the moral ________ of the person.", a: ["character"], diff: "Medium", expl: "Aristotle's focus." },
+        { q: "The ________ Mean is the balance between excess and deficiency.", a: ["golden"], diff: "Hard", expl: "Aristotle's Virtue concept." },
+        { q: "A ________-based culture relies on strict obedience to rules.", a: ["compliance"], diff: "Easy", expl: "vs. Values-based." },
+        { q: "James Burke led J&J during the ________ crisis.", a: ["tylenol"], diff: "Easy", expl: "Famous case study." },
+        { q: "We should treat humanity as an ________, never merely as a means.", a: ["end"], diff: "Hard", expl: "Kant's Human Dignity formulation." },
+        { q: "________ leadership requires being both a moral person and moral manager.", a: ["ethical"], diff: "Medium", expl: "Brown et al. definition." },
+        { q: "________ at the top describes how leaders influence culture.", a: ["tone"], diff: "Easy", expl: "Leadership impact." },
+        
+        // --- CHAPTER 5 ---
+        { q: "________ social responsibility refers to the ethical responsibilities a business has to society.", a: ["corporate"], diff: "Easy", expl: "CSR definition." },
+        { q: "The ________ model of CSR asserts that business exists solely to maximize profit.", a: ["economic"], diff: "Easy", expl: "Associated with Friedman." },
+        { q: "Do not cause ________ is the most obligatory level of ethical responsibility.", a: ["harm"], diff: "Medium", expl: "Moral minimum." },
+        { q: "________ self-interest implies that good ethics can lead to good business.", a: ["enlightened"], diff: "Medium", expl: "Long-term view." },
+        { q: "________ management is the practice of caring for the 'image' of the firm.", a: ["reputation"], diff: "Easy", expl: "Motivation for CSR." },
+        { q: "The ________ model of CSR puts social goals at the center of the mission.", a: ["integrative"], diff: "Medium", expl: "e.g., Social Entrepreneurship." },
+        { q: "Milton ________ is the economist famous for the Stockholder Theory.", a: ["friedman"], diff: "Easy", expl: "Famous 1970 article." },
+        { q: "Greenwashing is a form of social ________, focusing on image over substance.", a: ["marketing"], diff: "Hard", expl: "Deceptive CSR." },
+        { q: "A ________ corporation is legally required to pursue social goals (B-Corp).", a: ["benefit"], diff: "Medium", expl: "New legal form." },
+        { q: "The ________ minimum refers to the duty to cause no harm.", a: ["moral"], diff: "Hard", expl: "Key concept in Stakeholder theory." },
+    
+        // --- CHAPTER 6 ---
+        { q: "Employment at ________ allows employers to fire workers for any reason.", a: ["will"], diff: "Easy", expl: "EAW doctrine." },
+        { q: "________ process refers to the right to be protected against arbitrary authority.", a: ["due"], diff: "Medium", expl: "Fairness in firing/discipline." },
+        { q: "________ action attempts to redress past discrimination by including minorities.", a: ["affirmative"], diff: "Medium", expl: "Controversial policy." },
+        { q: "The federal agency responsible for workplace safety is ________.", a: ["osha"], diff: "Easy", expl: "Occupational Safety and Health Administration." },
+        { q: "________ discrimination involves treating people differently based on non-job factors.", a: ["workplace", "employment"], diff: "Easy", expl: "Or simply 'Discrimination'." },
+        { q: "Covert discrimination is often revealed in studies using fake ________.", a: ["resumes"], diff: "Medium", expl: "Name bias studies." },
+        { q: "________ harassment includes 'quid pro quo' and hostile work environments.", a: ["sexual"], diff: "Easy", expl: "Illegal workplace conduct." },
+        { q: "Market ________ occurs when workers lack information about safety risks.", a: ["failure"], diff: "Hard", expl: "Justification for regulation." },
+        { q: "Critics of Affirmative Action call it ________ discrimination.", a: ["reverse"], diff: "Medium", expl: "Discrimination against the majority." },
+        { q: "________ of contract is a main argument supporting Employment at Will.", a: ["freedom"], diff: "Hard", expl: "The liberty to enter/exit agreements." },
+        
+        // --- CHAPTER 7 FILLS ---
+        { q: "Privacy is defined as the right to be let ________.", a: ["alone"], diff: "Easy", expl: "Warren & Brandeis definition." },
+        { q: "A ________ is a value fundamental across culture and theory (e.g. freedom).", a: ["hypernorm"], diff: "Hard", expl: "Foundation of universal privacy." },
+        { q: "The ________ Effect suggests productivity rises when workers know they are watched.", a: ["hawthorne"], diff: "Medium", expl: "Impact of observation." },
+        { q: "Privacy is rooted in the fundamental human right to ________.", a: ["autonomy"], diff: "Medium", expl: "Self-rule." },
+        { q: "Employers argue monitoring is necessary to protect ________ rights (assets).", a: ["property"], diff: "Easy", expl: "Justification for monitoring." },
+        { q: "Employees and employers have a ________ obligation to respect rights.", a: ["reciprocal"], diff: "Hard", expl: "Mutual duty." },
+        { q: "Monitoring should be limited to the ________ (location context).", a: ["workplace"], diff: "Easy", expl: "No monitoring at home/private areas." },
+        { q: "To be ethical, monitoring requires advance ________ to employees.", a: ["notice"], diff: "Medium", expl: "Transparency." },
+        { q: "Apple's App Tracking ________ requires user permission for data tracking.", a: ["transparency"], diff: "Medium", expl: "ATT feature." },
+        { q: "Monitoring can create a ________ work environment if done excessively.", a: ["hostile", "suspicious"], diff: "Easy", expl: "Negative consequence." },
+        
+        // --- CHAPTER 8 FILLS ---
+        { q: "The 4 P's of marketing are Product, Price, ________, and Placement.", a: ["promotion"], diff: "Easy", expl: "Basic marketing mix." },
+        { q: "________ consent requires that the buyer is not deceived.", a: ["informed"], diff: "Medium", expl: "Knowledge of facts." },
+        { q: "________ involves guiding behavior by bypassing rational decision-making.", a: ["manipulation"], diff: "Medium", expl: "vs. Persuasion." },
+        { q: "Marketing ethics examines the responsibilities associated with ________ (swapping goods).", a: ["exchange"], diff: "Medium", expl: "The core activity of markets." },
+        { q: "Targeting ________ populations (like the elderly) is often seen as manipulative.", a: ["vulnerable"], diff: "Easy", expl: "Lack of defenses." },
+        { q: "American ________ was the company founded by Dov Charney.", a: ["apparel"], diff: "Easy", expl: "Case study company." },
+        { q: "Costs of production not integrated into the price (like pollution) are called ________.", a: ["externalities"], diff: "Hard", expl: "Economic term." },
+        { q: "________ implies 'this for that', a type of sexual harassment.", a: ["quid pro quo"], diff: "Hard", expl: "Trading favors for sex." },
+        { q: "Deceptive advertising violates the ________ ethical duty to tell the truth.", a: ["deontological", "kantian"], diff: "Hard", expl: "Duty/Principle based." },
+        { q: "The AMA defines marketing as creating, communicating, and delivering ________.", a: ["value"], diff: "Medium", expl: "Core purpose." },
+        
+        // --- CHAPTER 9 FILLS ---
+        { q: "________ are costs of production (like pollution) borne by third parties.", a: ["externalities"], diff: "Easy", expl: "Market failure concept." },
+        { q: "The ________ Approach relies on government standards to protect the environment.", a: ["regulatory"], diff: "Easy", expl: "vs. Market approach." },
+        { q: "________ is a method of planning from a sustainable future back to the present.", a: ["backcasting"], diff: "Medium", expl: "The Natural Step." },
+        { q: "Daly argues the economy is a subset of the finite ________.", a: ["biosphere", "ecosystem"], diff: "Hard", expl: "Biophysical limits." },
+        { q: "The ________ Bottom Line includes Economic, Ethical, and Environmental goals.", a: ["triple"], diff: "Easy", expl: "Sustainability framework." },
+        { q: "________-efficiency means doing more with less (reducing resource intensity).", a: ["eco"], diff: "Medium", expl: "Sustainable practice." },
+        { q: "Biomimicry involves modeling production on biological ________ (waste = food).", a: ["processes", "cycles"], diff: "Hard", expl: "Nature as model." },
+        { q: "The ________ Approach assumes efficient markets allocate resources best.", a: ["market"], diff: "Easy", expl: "Baxter's view." },
+        { q: "Resources are considered ________ if they can be replaced by substitutes.", a: ["fungible"], diff: "Hard", expl: "Market approach assumption." },
+        { q: "Sustainable development meets present needs without compromising the ________.", a: ["future"], diff: "Medium", expl: "Brundtland definition." },
+    
+        // --- CHAPTER 10 FILLS ---
+        { q: "________ are professionals (auditors, attorneys) who act as market watchdogs.", a: ["gatekeepers"], diff: "Easy", expl: "Chapter 10 core concept." },
+        { q: "A ________ of interest occurs when professional duties clash with personal gain.", a: ["conflict"], diff: "Easy", expl: "Key ethical issue in finance." },
+        { q: "Board members have a ________ duty to act in the best interest of the corporation.", a: ["fiduciary"], diff: "Hard", expl: "Legal/Ethical obligation." },
+        { q: "The ________-Oxley Act was passed to regulate accounting after Enron.", a: ["sarbanes"], diff: "Medium", expl: "SOX Act." },
+        { q: "The duty of ________ requires board members to give undivided allegiance.", a: ["loyalty"], diff: "Medium", expl: "One of the 3 duties." },
+        { q: "________ trading involves buying/selling stock based on non-public information.", a: ["insider"], diff: "Medium", expl: "Illegal market activity." },
+        { q: "The duty of ________ requires executives to exercise reasonable diligence.", a: ["care"], diff: "Medium", expl: "Avoiding negligence." },
+        { q: "Arthur ________ was the accounting firm that collapsed with Enron.", a: ["andersen"], diff: "Hard", expl: "The auditor." },
+        { q: "High executive compensation is often justified as an ________ for performance.", a: ["incentive"], diff: "Easy", expl: "Utilitarian argument." },
+        { q: "The ________-Agent problem explains the conflict between owners and managers.", a: ["principal"], diff: "Hard", expl: "Governance theory." }
+    ];
+
+    /* ================= LOGIC ================= */
+
+    let currentQuizMCQ = [];
+    let currentQuizFill = [];
+    let bookmarks = JSON.parse(localStorage.getItem('be_bookmarks')) || [];
+
+    // --- Theme Toggle ---
+    function toggleTheme() {
+        const body = document.body;
+        const current = body.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', next);
+        document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+
+    // --- Tab Switching ---
+    function switchTab(tab) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        if(tab === 'quiz') {
+            document.getElementById('quiz-section').style.display = 'block';
+            document.getElementById('mindmap-section').style.display = 'none';
+        } else {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('mindmap-section').style.display = 'block';
+        }
+    }
+
+    // --- Bookmarking Logic (FIXED) ---
+    // Use button element to traverse DOM and get data attribute
+    function toggleBookmark(btnElement) {
+        // Safe retrieval of question text including quotes
+        const questionText = btnElement.getAttribute('data-question');
+        
+        const index = bookmarks.indexOf(questionText);
+        if (index === -1) {
+            bookmarks.push(questionText);
+            btnElement.classList.add('active');
+            btnElement.innerHTML = '★'; // Solid Star
+        } else {
+            bookmarks.splice(index, 1);
+            btnElement.classList.remove('active');
+            btnElement.innerHTML = '☆'; // Outline Star
+        }
+        localStorage.setItem('be_bookmarks', JSON.stringify(bookmarks));
+    }
+
+    function isBookmarked(qText) {
+        return bookmarks.includes(qText);
+    }
+
+    // --- Shuffle Utility ---
+    function shuffleArray(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // --- Quiz Generation ---
+    function initQuiz() {
+        generateQuiz(false);
+    }
+
+    function loadBookmarksOnly() {
+        generateQuiz(true);
+    }
+
+    function generateQuiz(onlyBookmarks = false) {
+        const quizDiv = document.getElementById('quiz-area');
+        quizDiv.innerHTML = "";
+        document.getElementById('final-score').innerHTML = "";
+        
+        let poolM = [...poolMCQ];
+        let poolF = [...poolFill];
+
+        if (onlyBookmarks) {
+            poolM = poolM.filter(i => isBookmarked(i.q));
+            poolF = poolF.filter(i => isBookmarked(i.q));
+            
+            if (poolM.length === 0 && poolF.length === 0) {
+                quizDiv.innerHTML = `
+                    <div style='text-align:center; padding: 40px; color: var(--text-sec);'>
+                        <h2>No bookmarks yet!</h2>
+                        <p>Click the ☆ icon on questions to add them to your review list.</p>
+                        <button onclick="initQuiz()" style="background:var(--accent); color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Go to Random Quiz</button>
+                    </div>`;
+                document.getElementById('submit-btn').style.display = 'none';
+                document.getElementById('filter-bookmarks-btn').style.display = 'none';
+                document.getElementById('reset-btn').style.display = 'none';
+                return;
+            }
+        } else {
+            poolM = shuffleArray(poolM).slice(0, 15); // Random 15
+            poolF = shuffleArray(poolF).slice(0, 10); // Random 10
+        }
+
+        currentQuizMCQ = poolM;
+        currentQuizFill = poolF;
+
+        // Render MCQ
+        if(currentQuizMCQ.length > 0) {
+            let html = '<div class="section-header">Part 1: Multiple Choice</div>';
+            currentQuizMCQ.forEach((item, index) => {
+                const bookmarked = isBookmarked(item.q) ? 'active' : '';
+                const starIcon = bookmarked ? '★' : '☆';
+                // ESCAPE QUOTES FOR DATA ATTRIBUTE SAFETY
+                const safeQuestionText = item.q.replace(/"/g, '&quot;'); 
+
+                html += `
+                    <div class="question-card">
+                        <span class="difficulty-badge diff-${item.diff}">${item.diff}</span>
+                        <!-- Fixed: Use data-question attribute and pass 'this' -->
+                        <span class="bookmark-btn ${bookmarked}" 
+                              data-question="${safeQuestionText}" 
+                              onclick="toggleBookmark(this)">${starIcon}</span>
+                        
+                        <div class="question-text">${index + 1}. ${item.q}</div>
+                        <div class="options">`;
+                item.options.forEach((opt, optIndex) => {
+                    html += `<label><input type="radio" name="mcq_${index}" value="${optIndex}"> ${opt}</label>`;
+                });
+                html += `</div>
+                        <div class="explanation" id="mcq-exp-${index}">
+                            <strong>Answer:</strong> <span class="${item.answer === '?' ? 'wrong' : 'correct'}">${item.options[item.answer]}</span><br>
+                            ${item.expl}
+                        </div>
+                    </div>`;
+            });
+            quizDiv.innerHTML += html;
+        }
+
+        // Render Fill
+        if(currentQuizFill.length > 0) {
+            let html = '<br><div class="section-header">Part 2: Fill in the Blanks</div>';
+            currentQuizFill.forEach((item, index) => {
+                const bookmarked = isBookmarked(item.q) ? 'active' : '';
+                const starIcon = bookmarked ? '★' : '☆';
+                const safeQuestionText = item.q.replace(/"/g, '&quot;');
+
+                html += `
+                    <div class="question-card">
+                        <span class="difficulty-badge diff-${item.diff}">${item.diff}</span>
+                        <span class="bookmark-btn ${bookmarked}" 
+                              data-question="${safeQuestionText}" 
+                              onclick="toggleBookmark(this)">${starIcon}</span>
+                        
+                        <div class="question-text">${index + 1}. ${item.q}</div>
+                        <input type="text" id="fill_${index}" placeholder="Type answer...">
+                        <div class="explanation" id="fill-exp-${index}">
+                            <strong>Correct Answer:</strong> ${item.a[0]}<br>
+                            ${item.expl}
+                        </div>
+                    </div>`;
+            });
+            quizDiv.innerHTML += html;
+        }
+
+        document.getElementById('submit-btn').style.display = 'block';
+        document.getElementById('reset-btn').style.display = 'none'; // Hide reset during quiz
+        document.getElementById('filter-bookmarks-btn').style.display = onlyBookmarks ? 'none' : 'block';
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        let total = currentQuizMCQ.length + currentQuizFill.length;
+
+        // Check MCQs
+        currentQuizMCQ.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="mcq_${index}"]:checked`);
+            const exp = document.getElementById(`mcq-exp-${index}`);
+            exp.style.display = 'block';
+            if (selected && parseInt(selected.value) === item.answer) {
+                score++;
+                exp.style.borderLeftColor = 'var(--success)';
+            } else {
+                exp.style.borderLeftColor = 'var(--danger)';
+            }
+        });
+
+        // Check Fills
+        currentQuizFill.forEach((item, index) => {
+            const input = document.getElementById(`fill_${index}`).value.trim().toLowerCase();
+            const exp = document.getElementById(`fill-exp-${index}`);
+            exp.style.display = 'block';
+            if (item.a.includes(input)) {
+                score++;
+                exp.style.borderLeftColor = 'var(--success)';
+            } else {
+                exp.style.borderLeftColor = 'var(--danger)';
+            }
+        });
+
+        const percent = Math.round((score/total)*100);
+        document.getElementById('final-score').innerHTML = `Score: ${score}/${total} (${percent}%)`;
+        
+        document.getElementById('submit-btn').style.display = 'none';
+        document.getElementById('reset-btn').style.display = 'block'; // Show reset after submit
+        
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // Initialize
+    initQuiz();
+
+</script>
+
+</body>
+</html>
